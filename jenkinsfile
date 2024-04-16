@@ -27,7 +27,7 @@ pipeline{
             }
             
         }
-        
+        		
         stage('Deploy the image'){
             steps{
                 sh 'docker run -itd -P priyanka926/abctechimage:$BUILD_NUMBER'
@@ -35,7 +35,7 @@ pipeline{
             
         }
         
-        stage('Push the image to docker hub'){
+        stage('Push image'){
            agent any
            steps{
                withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
