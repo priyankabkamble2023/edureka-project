@@ -1,0 +1,52 @@
+pipeline{
+    
+    tools{
+        maven 'mymaven'
+    }
+    agent any
+    
+    stages{
+        
+        stage('Clone the repo'){
+            steps{
+                git 'https://github.com/priyankabkamble2023/edureka-project.git'
+            }
+            
+        }
+        
+        stage('Package the code'){
+            steps{
+                sh 'mvn package'
+            }
+            
+        }
+         stage('Build the image'){
+            steps{
+                sh 'cp /var/lib/jenkins/workspace/CICDpipeline/target/ABCtechnologies-1.0.war .'
+                sh 'chmod 777 /var/run/docker.sock'
+                sh 'docker build -t priyanka926/abctechimage:$BUILD_NUMBER .'
+            }
+            
+        }
+        
+        stage('Deploy the image'){
+            steps{
+                sh 'docker run -itd -P priyanka926/abctechimage:$BUILD_NUMBER'
+            }
+            
+        }
+        
+        stage('Push the image to docker hub'){
+           agent any
+           steps{
+               withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+				  sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+				  sh 'docker push priyanka926/abctechimage:$BUILD_NUMBER'
+				}
+           }
+            
+        }
+        
+    }
+    
+}
