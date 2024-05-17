@@ -4,7 +4,12 @@ pipeline{
         maven 'mymaven'
     }
     agent any
-    
+     environment{
+        PROJECT_ID='My First Project'
+        CLUSTER='abctechnologies-cluster'
+        LOCATION='us-central1-c'
+        CREDENTIALS_ID='SECRET_TOKEN'
+        }
     stages{
         
         stage('Clone the repo'){
@@ -51,8 +56,16 @@ pipeline{
 				  sh 'docker run -itd -P priyanka926/abctechimage:$BUILD_NUMBER'
 				}
            }
+	   
+          stage('Deploy on K8 cluster'){
+           steps{
+				  sh "sed -i 's/abctechimage:latest/abctechimage:#BUILD_NUMBER/g' deployment.yml"
+                 step([$class: 'KubernetesEngineBuilder', projectId:env.PROJECT_ID,clusterName: env.CLUSTER,location: env.LOCATION,manifestPattern: 'deployment.yml',credentialsId: env.CREDENTIALS_ID])
+
+				}
+           }   	   
             
-        }
+       
         
     }
     
