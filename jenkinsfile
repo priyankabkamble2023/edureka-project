@@ -48,7 +48,7 @@ pipeline{
 		
 		stage('Deploy as container'){
            steps{
-				  sh 'docker run -itd -p priyanka926/abctechimage:$BUILD_NUMBER'
+				  sh 'docker run -itd -P priyanka926/abctechimage:$BUILD_NUMBER'
 				}
            }
             
